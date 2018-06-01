@@ -1,0 +1,4 @@
+# build artifacts
+*.[oa]
+test
+*.project.pbxproj
