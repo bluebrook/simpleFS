@@ -29,10 +29,10 @@ Disk::~Disk ()
         fsync(fd);
         close(fd);
     }
-    printf("Shut Down: total read %d, total write %d\n");
+    printf("Shut Down: total read %d, total write %d\n", readCount, writeCount);
 }
 
-int Disk::openDisk(char *filename, int nbytes)
+int Disk::openDisk(const char *filename, int nbytes)
 {
     num_blocks = (nbytes + BLOCKSIZE - 1)/BLOCKSIZE;
     //fd = open(filename, O_RDWR|O_CREAT, 0644) ;
@@ -40,11 +40,13 @@ int Disk::openDisk(char *filename, int nbytes)
         printf("Failed to open file %s\n", filename);
         exit(1);
     }
-    if (ftruncate(fd, num_blocks*BLOCKSIZE) == -1)  {
-        printf("Failed to truncate file %s to size %d\n", filename, num_blocks*BLOCKSIZE);
-        exit(1);
+    if (nbytes > 0) {
+        if (ftruncate(fd, num_blocks*BLOCKSIZE) == -1)  {
+            printf("Failed to truncate file %s to size %d\n", filename, num_blocks*BLOCKSIZE);
+            exit(1);
+        }
     }
-       return 0;
+    return 0;
 }
 int Disk::readBlock(int blocknr, void *block){
     if (blocknr > num_blocks-1) {
@@ -62,7 +64,7 @@ int Disk::readBlock(int blocknr, void *block){
     return 0;
 };
 int Disk::writeBlock (int blocknr, void *block){
-    printf("fd =%d, current pos= %lld\n", fd, lseek(fd, 0, SEEK_CUR));
+    //printf("fd =%d, current pos= %lld\n", fd, lseek(fd, 0, SEEK_CUR));
     if (blocknr > num_blocks-1) {
         printf("The blocknr = %d exceeds the disk limits %d\n", blocknr, num_blocks);
         return -1;
@@ -83,12 +85,12 @@ void Disk::syncDisk(){
     fsync(fd);
 };
 
-void Disk:zeroDisk() {
+void Disk::zeroDisk() {
     char buffer[BLOCKSIZE] = {0};
     for (int i = 0; i < num_blocks; i++) {
         writeBlock(i, buffer);
     }
-    syncDiks();
+    syncDisk();
 }
 
 /*

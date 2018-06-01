@@ -9,13 +9,13 @@
 #ifndef disk_h
 #define disk_h
 
-#define BLOCKSIZE 4096
+#define BLOCKSIZE 512
 
 class Disk {
 public:
     Disk();
     ~Disk();
-    int openDisk(char *filename, int nbytes);
+    int openDisk(const char *filename, int nbytes);
     int readBlock(int blocknr, void *block);
     int writeBlock(int blocknr, void *block);
     void zeroDisk();
